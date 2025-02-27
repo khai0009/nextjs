@@ -64,6 +64,7 @@ export default function Home() {
         type: 'auto',
         source: true
       }}
+      alt={flower.name}
     />
             <div>
               <h2 className="text-xl font-semibold">{flower.name}</h2>
