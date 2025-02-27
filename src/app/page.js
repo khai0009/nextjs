@@ -57,7 +57,7 @@ export default function Home() {
         {filteredFlowers.map(flower => (
           <div key={flower.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
             <CldImage
-      src="cld-sample-5" // Use this sample image or upload your own via the Media Explorer
+      src={flower.imageUrl} // Use this sample image or upload your own via the Media Explorer
       width="500" // Transform the image: auto-crop to square aspect_ratio
       height="500"
       crop={{
