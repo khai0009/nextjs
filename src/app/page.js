@@ -2,6 +2,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { db } from '../app/Firebase';
+import { CldImage } from 'next-cloudinary';
 import { collection, getDocs } from 'firebase/firestore';
 
 export default function Home() {
@@ -35,13 +36,14 @@ export default function Home() {
   );
 
   return (
+
     <div className="max-w-6xl mx-auto p-4">
-      <header className="flex justify-between items-center py-4 border-b">
-        <h1 className="text-3xl font-bold">Flower Shop</h1>
-        <div className="bg-gray-100 px-4 py-2 rounded-full">
-          Cart: {cart.length} items
-        </div>
-      </header>
+      <header className="flex flex-col sm:flex-row justify-between items-center py-4 border-b">
+    <h1 className="text-3xl font-bold mb-2 sm:mb-0">Flower Shop</h1>
+    <div className="bg-gray-100 px-4 py-2 rounded-full text-sm sm:text-base">
+        Cart: {cart.length} items
+    </div>
+</header>
 
       <input
         type="text"
@@ -54,11 +56,15 @@ export default function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-6">
         {filteredFlowers.map(flower => (
           <div key={flower.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-            <img 
-              src={flower.imgUrl} 
-              alt={flower.name} 
-              className="w-full h-48 object-cover rounded-md mb-4"
-            />
+            <CldImage
+      src="cld-sample-5" // Use this sample image or upload your own via the Media Explorer
+      width="500" // Transform the image: auto-crop to square aspect_ratio
+      height="500"
+      crop={{
+        type: 'auto',
+        source: true
+      }}
+    />
             <div>
               <h2 className="text-xl font-semibold">{flower.name}</h2>
               <p className="text-gray-600 mt-1">{flower.description}</p>
