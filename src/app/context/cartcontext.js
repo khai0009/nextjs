@@ -1,18 +1,13 @@
-"use client"
+"use client";
 import { useState, useEffect, createContext, useContext } from 'react';
-import {  doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../Firebase'; // Đảm bảo đường dẫn chính xác
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const [userPhone, setUserPhone] = useState(null); // Số điện thoại khách hàng
-  const [showLoginModal, setShowLoginModal] = useState(false); // Trạng thái hiển thị modal đăng nhập
-
 
   useEffect(() => {
-    // Load cart from local storage (nếu cần)
+    // Load cart from local storage
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
       setCart(JSON.parse(storedCart));
@@ -20,66 +15,45 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Save cart to local storage (nếu cần)
+    // Save cart to local storage
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const loadCartFromFirestore = async (phone) => {
-    try {
-      const cartDoc = await getDoc(doc(db, 'carts', phone));
-      if (cartDoc.exists()) {
-        setCart(cartDoc.data().items || []);
-      }
-    } catch (error) {
-      console.error('Lỗi khi tải giỏ hàng từ Firestore:', error);
-    }
-  };
-
-  const saveCartToFirestore = async (phone, cartItems) => {
-    try {
-      await setDoc(doc(db, 'carts', phone), { items: cartItems });
-    } catch (error) {
-      console.error('Lỗi khi lưu giỏ hàng vào Firestore:', error);
-    }
-  };
-
-  const addToCart = async (newItem) => {
-    if (!userPhone) {
-      setShowLoginModal(true); // Hiển thị modal đăng nhập
-      return;
-    }
-
+  const addToCart = (newItem) => {
     setCart((prevItems) => {
       const existingItemIndex = prevItems.findIndex((item) => item.id === newItem.id);
 
       let updatedItems;
       if (existingItemIndex !== -1) {
-        // Sản phẩm đã tồn tại, tăng local lên 1
+        // Product exists, increase quantity
         updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].local =
-          (updatedItems[existingItemIndex].local || 1) + 1;
+        updatedItems[existingItemIndex].quantity =
+          (updatedItems[existingItemIndex].quantity || 1) + 1;
       } else {
-        // Sản phẩm mới, thêm vào giỏ hàng với local = 1
-        updatedItems = [...prevItems, { ...newItem, local: 1 }];
+        // New product, add to cart with quantity 1
+        updatedItems = [...prevItems, { ...newItem, quantity: 1 }];
       }
-      saveCartToFirestore(userPhone, updatedItems); // Lưu giỏ hàng vào Firestore
       return updatedItems;
     });
   };
 
-  // Hàm để cập nhật số điện thoại người dùng
-  const updateUserPhone = (phone) => {
-    setUserPhone(phone);
-    loadCartFromFirestore(phone); // Tải giỏ hàng từ Firestore
+  const removeFromCart = (itemId) => {
+    setCart((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
 
-  // Hàm để ẩn modal đăng nhập
-  const hideLoginModal = () => {
-    setShowLoginModal(false);
+  const updateQuantity = (itemId, newQuantity) => {
+    setCart((prevItems) => {
+      return prevItems.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, quantity: Math.max(1, parseInt(newQuantity, 10) || 1) }; // Ensure quantity is at least 1
+        }
+        return item;
+      });
+    });
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, userPhone, updateUserPhone, showLoginModal, hideLoginModal }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

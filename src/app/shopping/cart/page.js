@@ -85,7 +85,7 @@ export default function CartPage() {
                           ))}
                       </tbody>
                   </table><div className="mt-4 text-right">
-                          <p className="text-lg font-semibold">Tổng tiền: {totalPrice} đ</p>
+                          <p className="text-lg font-semibold">Tổng tiền: {totalPrice} vnd</p>
                       </div></>
       )
     }
