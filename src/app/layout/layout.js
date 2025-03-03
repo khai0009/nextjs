@@ -48,9 +48,9 @@ export default  function Layout({ children }) {
             {loggedInUser ? (
         <p className="text-lg">Chào mừng {loggedInUser}</p>
       ) : (
-            <p className="text-lg"><FontAwesomeIcon icon={faSignIn} /> Đăng nhập </p>
+            <Link className="text-lg" href="/login/login"><FontAwesomeIcon icon={faSignIn} /> Đăng nhập </Link>
       )}
-            <p className="text-lg"><FontAwesomeIcon icon={faShoppingBag}/> {cart.length} sản phẩm</p>
+            <Link className="text-lg" href="/shopping/cart"><FontAwesomeIcon icon={faShoppingBag}/> {cart.length} sản phẩm</Link>
             </li>
               <li className="border-b-2  border-red-300 pl-5">
               <p className=" text-lg "><FontAwesomeIcon icon={faPhone}/> 0993745782</p>
