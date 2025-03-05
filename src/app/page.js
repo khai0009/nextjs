@@ -13,7 +13,7 @@ export default function Home() {
   const [flowers, setFlowers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [LoggedInUser,setLoggedInUser] = useState('')
-  const {cart, addToCart, showLoginModal, hideLoginModal, updateUserPhone } = useCart();
+  const {cart, addToCart } = useCart();
 
 
   useEffect(() => {
@@ -91,8 +91,8 @@ export default function Home() {
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-center py-2">
         {filteredFlowers.map(flower => (
        
-          <Link href={`/detail/${flower.id}`} key={flower.id} className="border rounded-lg hover:shadow-lg transition-shadow">
-            <CldImage
+          <div  key={flower.id} className="border rounded-lg hover:shadow-lg transition-shadow">
+            <Link href={`/detail/${flower.id}`}><CldImage
       src={flower.imageUrl} // Use this sample image or upload your own via the Media Explorer
       width="500" // Transform the image: auto-crop to square aspect_ratio
       height="700"
@@ -102,27 +102,39 @@ export default function Home() {
       }}
       alt={flower.name}
     />
+       </Link>
             <div>
               <h2 className="text-xl font-semibold">{flower.name}</h2>
              
               <p className="text-lg font-medium mt-2"> {flower.price} VND</p>
               <div className="flex gap-2 mt-4">
-              <div>
-      {/* ... */}
-      <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors" onClick={() => addToCart({ id: 1, name: 'Sản phẩm 1', price: 10 })}>
-        Thêm vào giỏ hàng
-      </button>
-    </div>
+             
+    <button
+                className={`text-white px-4 py-2 rounded-md ${
+                  flower.quantity > 0
+                    ? 'bg-blue-600  hover:bg-blue-700 transition-colors'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+                disabled={flower.quantity === 0}
+                onClick={() => addToCart({ id: flower.id, name: flower.name, price: flower.price, imageUrl: flower.imageUrl })}
+              >
+                {flower.quantity > 0 ? 'Thêm vào giỏ hàng' : 'Sold Out'}
+              </button>
                 <button 
+                  
                   onClick={() => purchaseNow(flower)}
-                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+                  className = {`bg-green-600 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-green-700 transition-colors ${
+                    flower.quantity > 0
+                      ? 'block'
+                      : 'hidden'
+                  }`}
                 >
                  Mua ngay
                 </button>
               </div>
             </div>
             
-          </Link>
+          </div>
               
         ))}
         

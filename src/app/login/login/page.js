@@ -1,26 +1,27 @@
 "use client";
 import Head from 'next/head';
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link'
 import { useRouter } from 'next/navigation';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../Firebase';
+import {signInWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../../Firebase'
 
-export default function LoginPage() {
+export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, `${phoneNumber}@example.com`, password);
+      alert('Đăng nhập thành công!');
       localStorage.setItem('loggedInUser', phoneNumber);
       router.push('/');
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      console.error('Lỗi: ', error);
+      alert(`Lỗi: ${error.message}`);
     }
   };
 
@@ -31,7 +32,6 @@ export default function LoginPage() {
       </Head>
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow">
         <h2 className="text-2xl font-bold text-center text-pink-600">Đăng nhập</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
@@ -63,7 +63,7 @@ export default function LoginPage() {
         </form>
         <div className="mt-4 grid">
           <Link href="/login/register" className="text-sm text-pink-600 hover:underline">
-            Đăng ký tài khoản
+            Chưa có tài khoản? hãy đăng ký!!
           </Link>
         </div>
         <div className="mt-4 grid">

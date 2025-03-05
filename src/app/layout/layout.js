@@ -2,7 +2,6 @@
 import { useState,useEffect  } from 'react';
 import Image from 'next/image'
 import { useCart } from '../context/cartcontext';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone,faShoppingBag,faCalculator,faEnvelope,faSignIn,faBars } from '@fortawesome/free-solid-svg-icons';
@@ -11,13 +10,25 @@ import { faYoutube, faFacebook, faInstagram,faTiktok,faTwitter } from '@fortawes
 
 export default  function Layout({ children }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen2, setIsMenuOpen2] = useState(false);
     const [loggedInUser, setLoggedInUser] = useState(null);
-    const {cart, addToCart, showLoginModal, hideLoginModal, updateUserPhone } = useCart();
-    
+    const {cart,setCart } = useCart();
+    let tongQuantity = 0;
+    if (cart && cart.length > 0) {
+    tongQuantity = cart.reduce((tong, item) => tong + (item.quantity || 0), 0);
+    }
+
     useEffect(() => {
         const user = localStorage.getItem('loggedInUser');
+
+    
+      
         if (user) {
-          setLoggedInUser(user);
+          const visibleDigits = user.substring(0, 3);
+          const hiddenDigits = '*'.repeat(user.length - 5);
+          const lastDigits = user.substring(user.length - 2);
+  
+          setLoggedInUser(visibleDigits+hiddenDigits+lastDigits);
         }
       }, []);
     
@@ -26,16 +37,20 @@ export default  function Layout({ children }) {
         setIsMenuOpen(!isMenuOpen);
       };
 
-      const handleLogin = (phone) => {
-        updateUserPhone(phone);
-        hideLoginModal();
+      const toggleMenu2 = () => {
+        setIsMenuOpen2(!isMenuOpen2);
       };
+
+      const handleLogout = () => {
+        setLoggedInUser(null);
+        localStorage.removeItem('loggedInUser'); 
+    };
     
           return (
             <div className="w-full ">
             <header className=" items-center grid grid-flow-col grid-cols-3 sm:grid-cols-7 px-5 border-b bg-pink-200">
             <div className=" block sm:hidden">
-            <button className="peer bg-white rounded-xl border  text-xl p-2" onClick={toggleMenu}
+            <button className=" bg-white rounded-xl border  text-xl p-2" onClick={toggleMenu}
             ><FontAwesomeIcon icon={faBars}/></button>
             <div  onClick={toggleMenu} className={`flex flex-row bg-opacity-50 bg-gray-700 h-full w-full top-0 left-0 absolute transition-opacity duration-1000 ${ isMenuOpen ? 'opacity-100 block' : 'opacity-0 hidden'}`}>
             <ul className=" w-[70%] h-full bg-white rounded-sm  px-2  flex flex-col pt-28">
@@ -44,13 +59,15 @@ export default  function Layout({ children }) {
             <Image src="/Beautifulflower.jpg" className='mx-auto'width={200} height={100} alt="Beatifulflower.com" ></Image>
             </Link>
             </li>
-            <li className="border-b-2  border-red-300 pl-5">
+            <li className="border-b-2  border-red-300 ">
             {loggedInUser ? (
-        <p className="text-lg">Chào mừng {loggedInUser}</p>
+        <div className=' h-fit   pl-5' onClick={(e) => { toggleMenu2(); e.stopPropagation(); }}><p className="text-lg  text-purple-500 " onClick={(e) => { toggleMenu2(); e.stopPropagation(); }}>Chào mừng {loggedInUser}</p>
+          <p className={`text-base  mt-0 ${ isMenuOpen2 ? 'invisible' : 'visible'} text-red-500 absolute`} onClick={handleLogout}>Đăng xuất</p>
+          </div>
       ) : (
-            <Link className="text-lg" href="/login/login"><FontAwesomeIcon icon={faSignIn} /> Đăng nhập </Link>
+            <Link className="text-lg pl-5" href="/login/login"><FontAwesomeIcon icon={faSignIn} /> Đăng nhập </Link>
       )}<br/>
-            <Link className="text-lg" href="/shopping/cart"><FontAwesomeIcon icon={faShoppingBag}/> {cart.length} sản phẩm</Link>
+            <Link className="text-lg pl-5 " href="/shopping/cart"><FontAwesomeIcon icon={faShoppingBag}/> {tongQuantity} sản phẩm</Link>
             </li>
               <li className="border-b-2  border-red-300 pl-5">
               <p className=" text-lg "><FontAwesomeIcon icon={faPhone}/> 0993745782</p>
@@ -68,7 +85,8 @@ export default  function Layout({ children }) {
           <Image src="/Beautifulflower.jpg" width={200} height={100} className='col-span-2 sm:col-span-1' alt="Beatifulflower" ></Image>
           
           {loggedInUser ? (
-        <p className="ml-15 bg-pink-300 text-right px-2  rounded-full w-fit text-sm sm:text-base md:text-sm  hover:bg-yellow-500 hover:text-white transition-colors  hidden sm:block"> Chào mừng {loggedInUser}</p>
+        <div className='relative '><p className="peer  bg-pink-300 text-center p-2 mx-auto rounded-sm w-fit text-sm sm:text-base md:text-sm  hidden sm:block"> Chào mừng {loggedInUser}</p>
+        <p className='text-base  peer-hover:block w-[85%] h-fit p-1 right-5 hidden hover:block bg-white border-2 text-red-300 hover:bg-red-500 transition-colors absolute' onClick={handleLogout}>Đăng xuất</p></div>
       ) : (
           <Link href="/login/login">
           <div className=" justify-self-end end">
@@ -80,7 +98,7 @@ export default  function Layout({ children }) {
         <div className=" justify-self-end ">
           <Link href="/shopping/cart">
         <div className="bg-gray-100 px-4 py-2 w-12 md:w-36 text-center rounded-full text-sm sm:text-base cursor-pointer hidden sm:block">
-        <FontAwesomeIcon icon={faShoppingBag} className="text-sm xl:text-base"/> {cart.length} sản phẩm
+        <FontAwesomeIcon icon={faShoppingBag} className="text-sm xl:text-base"/> {tongQuantity} sản phẩm
         </div>
         </Link>
         </div>
@@ -98,9 +116,9 @@ export default  function Layout({ children }) {
               {/* Thông tin liên hệ */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Liên hệ</h3>
-                <p>Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM</p>
+                <p>Địa chỉ: 123 Đường ABC,Phường MNL, Quận XYZ, TP.HCM</p>
                 <p>Điện thoại: 0123 456 789</p>
-                <p>Email: info@flowershop.com</p>
+                <p>Email: info@Beautifulflower.com</p>
               </div>
         
               {/* Liên kết nhanh */}

@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { CartProvider } from './context/cartcontext';
 
 const geistSans = Geist({

@@ -97,7 +97,7 @@ export default function Login() {
             <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
             <input
               maxLength={10}
-              type="text"
+              type="tel"
               required
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}

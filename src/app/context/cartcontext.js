@@ -21,21 +21,22 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (newItem) => {
     setCart((prevItems) => {
-      const existingItemIndex = prevItems.findIndex((item) => item.id === newItem.id);
+        const existingItemIndex = prevItems.findIndex((item) => item.id === newItem.id);
 
-      let updatedItems;
-      if (existingItemIndex !== -1) {
-        // Product exists, increase quantity
-        updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity =
-          (updatedItems[existingItemIndex].quantity || 1) + 1;
-      } else {
-        // New product, add to cart with quantity 1
-        updatedItems = [...prevItems, { ...newItem, quantity: 1 }];
-      }
-      return updatedItems;
+        if (existingItemIndex !== -1) {
+            // Product exists, increase quantity by 1
+            const updatedItems = [...prevItems];
+            updatedItems[existingItemIndex] = {
+                ...updatedItems[existingItemIndex],
+                quantity: (updatedItems[existingItemIndex].quantity || 0) + 1, // Correct increment
+            };
+            return updatedItems;
+        } else {
+            // New product, add to cart with quantity 1
+            return [...prevItems, { ...newItem, quantity: 1 }];
+        }
     });
-  };
+};
 
   const removeFromCart = (itemId) => {
     setCart((prevItems) => prevItems.filter((item) => item.id !== itemId));
@@ -52,8 +53,12 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart'); // Xóa giỏ hàng khỏi localStorage
+  };
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity,clearCart }}>
       {children}
     </CartContext.Provider>
   );
